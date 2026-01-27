@@ -632,16 +632,19 @@ export class WebSocketClient {
     this.stopListening();
     this.clearAudioQueue();
     this.stopAudioStatsMonitoring();
-    
+
     if (this.socket) {
       this.socket.close();
       this.socket = null;
     }
-    
+
     this.isConnected = false;
     // Clear last redirect idempotence key on explicit disconnect
     this.lastRedirectKey = null;
-    
+
+    // Clear cached serverUrl so next connect() fetches fresh routing
+    this.config.serverUrl = undefined;
+
     // If we had redirected, restore initial agent/environment so the next connect
     // returns to the original target unless app overrides explicitly.
     if (this.redirected) {
