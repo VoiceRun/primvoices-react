@@ -1,6 +1,6 @@
 {
   "name": "primvoices-react",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "React client for the PrimVoices Agents API",
   "type": "module",
   "main": "./dist/index.umd.js",
