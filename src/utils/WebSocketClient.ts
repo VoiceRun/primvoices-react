@@ -642,8 +642,9 @@ export class WebSocketClient {
     // Clear last redirect idempotence key on explicit disconnect
     this.lastRedirectKey = null;
 
-    // Clear cached serverUrl so next connect() fetches fresh routing
+    // Clear cached serverUrl and parameters so next connect() fetches fresh routing
     this.config.serverUrl = undefined;
+    this.config.customParameters = {};
 
     // If we had redirected, restore initial agent/environment so the next connect
     // returns to the original target unless app overrides explicitly.
