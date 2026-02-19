@@ -116,11 +116,14 @@ export const PrimVoicesProvider: React.FC<PrimVoicesProviderProps> = ({
     if (clientRef.current) {
       try {
         await clientRef.current.connect();
-      } catch (err) {
-        setError('Failed to connect');
+      } catch (err: any) {
+        const message = err?.message || 'Failed to connect';
+        setError(message);
+        throw err;
       }
     } else {
       setError('Client not initialized');
+      throw new Error('Client not initialized');
     }
   };
 
