@@ -180,6 +180,11 @@ export class WebSocketClient {
       body: JSON.stringify({}),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    }
+
     const responseJson = await response.json();
 
     return responseJson.data;
