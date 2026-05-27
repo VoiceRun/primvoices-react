@@ -22,6 +22,7 @@ export interface WebSocketClientConfig {
   agentId: string;
   functionId?: string;
   environment?: string;
+  releaseId?: string;
   strategy?: "cascade" | "sts";
   logLevel?: "DEBUG" | "INFO" | "WARN" | "ERROR";
   serverUrl?: string;
@@ -86,6 +87,7 @@ export class WebSocketClient {
   private statsInterval: number | null = null;
   private initialAgentId: string;
   private initialEnvironment?: string;
+  private initialReleaseId?: string;
   private redirected = false;
   
   // Playback scheduling
@@ -119,6 +121,7 @@ export class WebSocketClient {
     // Capture initial target so we can restore it after a redirect
     this.initialAgentId = this.config.agentId;
     this.initialEnvironment = this.config.environment;
+    this.initialReleaseId = this.config.releaseId;
 
     logger.setLogLevel(this.config.logLevel || "ERROR");
     
@@ -165,6 +168,9 @@ export class WebSocketClient {
     const queryParams = new URLSearchParams();
     queryParams.set("inputType", "mic");
     queryParams.set("environment", this.config.environment || "");
+    if (this.config.releaseId) {
+      queryParams.set("releaseId", this.config.releaseId);
+    }
 
     if (this.config.customParameters) {
       Object.entries(this.config.customParameters).forEach(([key, value]) => {
@@ -249,6 +255,10 @@ export class WebSocketClient {
           inputType: "mic",
           origin: this.config.origin || "",
         } as Record<string, string>;
+
+        if (this.config.releaseId) {
+          params.releaseId = this.config.releaseId;
+        }
         
         // Send start message following the format in audio.ts
         const startMessage = {
@@ -656,6 +666,7 @@ export class WebSocketClient {
     if (this.redirected) {
       this.config.agentId = this.initialAgentId;
       this.config.environment = this.initialEnvironment;
+      this.config.releaseId = this.initialReleaseId;
       this.config.customParameters = {
         ...(this.config.customParameters || {}),
         agentId: this.config.agentId,
@@ -663,7 +674,7 @@ export class WebSocketClient {
         inputType: "mic",
       };
       this.redirected = false;
-      logger.info(`[WebSocketClient] Restored initial agent after redirect: agent=${this.config.agentId} env=${this.config.environment}`);
+      logger.info(`[WebSocketClient] Restored initial agent after redirect: agent=${this.config.agentId} env=${this.config.environment} release=${this.config.releaseId}`);
     }
 
     if (this.onConnectionClose) {
