@@ -27,6 +27,7 @@ export interface WebSocketClientConfig {
   serverUrl?: string;
   apiUrl?: string;
   customParameters?: Record<string, string>;
+  /** @deprecated Canary routing is decided server-side when the session URL is resolved; this flag has no effect. */
   canary?: boolean;
   origin?: "debugger" | "web";
 }
@@ -219,13 +220,8 @@ export class WebSocketClient {
       this.config.customParameters = agentConfiguration.parameters;
     }
     
-    // Construct the WebSocket URL with canary parameter if enabled
-    let wsUrl = this.config.serverUrl;
-    if (this.config.canary) {
-      const separator = wsUrl.includes('?') ? '&' : '?';
-      wsUrl = `${wsUrl}${separator}canary=true`;
-    }
-    
+    const wsUrl = this.config.serverUrl;
+
     // Create and setup new WebSocket connection
     this.socket = new WebSocket(wsUrl);
 
