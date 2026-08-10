@@ -18,11 +18,18 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      external: ["react", "react-dom", "tailwindcss"],
+      // react/jsx-runtime must be external: bundling it freezes the React
+      // version the library was BUILT with (React 19 → elements tagged
+      // react.transitional.element), which a React 18 host renderer rejects
+      // with minified error #31. Externalized, the host app's own runtime
+      // creates the elements. Mirrors voicerun-react 5a3526e.
+      external: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "tailwindcss"],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
+          "react/jsx-runtime": "jsxRuntime",
+          "react/jsx-dev-runtime": "jsxDevRuntime",
           tailwindcss: "tailwindcss",
         },
       },
